@@ -10,6 +10,16 @@ def win?(player1, player2)
     (player1 == 'scissors' && player2 == 'paper')
 end
 
+def name_winner(player, computer)
+  if win?(player, computer)
+    "player"
+  elsif win?(computer, player)
+    "computer"
+  else
+    "tie"
+  end
+end
+
 def display_result(player, computer)
   if win?(player, computer)
     prompt("You won!")
@@ -21,24 +31,55 @@ def display_result(player, computer)
 end
 
 loop do
-  choice = ''
+  declare_winner = false
+  round = 1
+  player_wins = 0
+  computer_wins = 0
+  tie_games = 0
+
   loop do
-    prompt("Choose one: #{VALID_CHOICES.join(', ')}")
-    choice = gets.chomp
+    prompt("Round: #{round}")
+    prompt("Player Wins: #{player_wins}")
+    prompt("Computer Wins: #{computer_wins}")
+    prompt("Tie Games: #{tie_games}")
 
-    break if VALID_CHOICES.include?(choice)
-    prompt("That's not a valid choice.")
+    choice = ''
+    loop do
+      prompt("Choose one: #{VALID_CHOICES.join(', ')}")
+      choice = gets.chomp
+
+      break if VALID_CHOICES.include?(choice)
+      prompt("That's not a valid choice.")
+    end
+
+    computer_choice = VALID_CHOICES.sample
+
+    prompt("You chose: #{choice}; Computer chose: #{computer_choice}")
+
+    display_result(choice, computer_choice)
+
+    if name_winner(choice, computer_choice) == "player"
+      player_wins += 1
+      prompt("Player takes the round")
+    elsif name_winner(choice, computer_choice) == "computer"
+      computer_wins += 1
+      prompt("Computer takes the round")
+    else
+      tie_games += 1
+    end
+
+    round += 1
+    if player_wins == 5 || computer_wins == 5
+      declare_winner = true
+      prompt("That's game!")
+    end
+
+    break if declare_winner
   end
-
-  computer_choice = VALID_CHOICES.sample
-
-  prompt("You chose: #{choice}; Computer chose: #{computer_choice}")
-
-  display_result(choice, computer_choice)
 
   prompt("Do you want to play again?")
   answer = gets.chomp
   break unless answer.downcase.start_with?('y')
 end
 
-prompt("Thank you for playing. Good bye!")
+prompt("Thank you for playing. Goodbye!")
