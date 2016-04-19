@@ -1,4 +1,8 @@
-VALID_CHOICES = %w(rock paper scissors lizard Spock).freeze
+VALID_CHOICES = { "r" => "rock",
+                  "p" => "paper",
+                  "s" => "scissors",
+                  "l" => "lizard",
+                  "S" => "Spock" }.freeze
 
 def prompt(message)
   puts("=> #{message}")
@@ -29,9 +33,9 @@ end
 
 def display_result(player, computer)
   if win?(player, computer)
-    prompt("You won!")
+    prompt("You won the round!")
   elsif win?(computer, player)
-    prompt("Computer won!")
+    prompt("Computer won the round!")
   else
     prompt("It's a tie!")
   end
@@ -45,6 +49,7 @@ loop do
   tie_games = 0
 
   loop do
+    puts "=" * 55
     prompt("Round: #{round}")
     prompt("Player Wins: #{player_wins}")
     prompt("Computer Wins: #{computer_wins}")
@@ -52,14 +57,17 @@ loop do
 
     choice = ''
     loop do
-      prompt("Choose one: #{VALID_CHOICES.join(', ')}")
-      choice = gets.chomp
+      prompt("Choose one by selecting the first character in the name: #{VALID_CHOICES.values.join(', ')}")
+      choice = VALID_CHOICES[gets.chomp]
 
-      break if VALID_CHOICES.include?(choice)
-      prompt("That's not a valid choice.")
+      begin
+        break if VALID_CHOICES.keys.each { |key| key.include?(choice) }
+      rescue TypeError
+        prompt("That's not a valid choice.")
+      end
     end
 
-    computer_choice = VALID_CHOICES.sample
+    computer_choice = VALID_CHOICES.values.sample
 
     prompt("You chose: #{choice}; Computer chose: #{computer_choice}")
 
@@ -67,10 +75,8 @@ loop do
 
     if declare_round_winner(choice, computer_choice) == "player"
       player_wins += 1
-      prompt("Player takes the round")
     elsif declare_round_winner(choice, computer_choice) == "computer"
       computer_wins += 1
-      prompt("Computer takes the round")
     else
       tie_games += 1
     end
@@ -79,6 +85,11 @@ loop do
     if player_wins == 5 || computer_wins == 5
       declare_game_winner = true
       prompt("That's game!")
+      if player_wins == 5
+        prompt("You won the game!")
+      else
+        prompt("The Computer won the game.")
+      end
     end
 
     break if declare_game_winner
