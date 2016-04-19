@@ -17,7 +17,7 @@ def win?(player1, player2)
     (player1 == 'rock' && player2 == 'scissors')
 end
 
-def name_winner(player, computer)
+def declare_round_winner(player, computer)
   if win?(player, computer)
     "player"
   elsif win?(computer, player)
@@ -38,7 +38,7 @@ def display_result(player, computer)
 end
 
 loop do
-  declare_winner = false
+  declare_game_winner = false
   round = 1
   player_wins = 0
   computer_wins = 0
@@ -65,10 +65,10 @@ loop do
 
     display_result(choice, computer_choice)
 
-    if name_winner(choice, computer_choice) == "player"
+    if declare_round_winner(choice, computer_choice) == "player"
       player_wins += 1
       prompt("Player takes the round")
-    elsif name_winner(choice, computer_choice) == "computer"
+    elsif declare_round_winner(choice, computer_choice) == "computer"
       computer_wins += 1
       prompt("Computer takes the round")
     else
@@ -77,11 +77,11 @@ loop do
 
     round += 1
     if player_wins == 5 || computer_wins == 5
-      declare_winner = true
+      declare_game_winner = true
       prompt("That's game!")
     end
 
-    break if declare_winner
+    break if declare_game_winner
   end
 
   prompt("Do you want to play again?")
