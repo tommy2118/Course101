@@ -1,1 +1,1 @@
-Kernal.puts("hello worls")
+Kernal.puts("hello world")
