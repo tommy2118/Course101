@@ -9,6 +9,14 @@ def prompt(msg)
   puts "=> #{msg}"
 end
 
+def joinor(array, delimiter = ',', *joining_word)
+  joined_string = ''
+  array.each do |word|
+    joined_string += word + delimiter
+  end
+  joined_string
+end
+
 # rubocop:disable Metrics/AbcSize
 def display_board(brd)
   system 'clear' || 'clr'
