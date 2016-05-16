@@ -14,6 +14,10 @@ def joinor(array, delimiter=', ', word='or')
   array.join(delimiter)
 end
 
+def score_board_display(player, computer, ties)
+  puts "Player Wins: #{player} Computer Wins: #{computer} Tie Games: #{ties}"
+end
+
 # rubocop:disable Metrics/AbcSize
 def display_board(brd)
   system 'clear' || 'clr'
@@ -78,25 +82,39 @@ def detect_winner(brd)
   nil
 end
 
+player_wins = 0
+computer_wins = 0
+tie_games = 0
 loop do
-  board = intialize_board
-  display_board(board)
-
   loop do
+    board = intialize_board
     display_board(board)
 
-    player_places_piece!(board)
-    break if someone_won?(board) || board_full?(board)
-    computer_palces_piece!(board)
-    break if someone_won?(board) || board_full?(board)
-  end
+    loop do
+      display_board(board)
 
-  display_board(board)
+      player_places_piece!(board)
+      break if someone_won?(board) || board_full?(board)
+      computer_palces_piece!(board)
+      break if someone_won?(board) || board_full?(board)
+    end
 
-  if someone_won?(board)
-    prompt "#{detect_winner(board)} won!"
-  else
-    prompt "It's a tie!"
+    display_board(board)
+    if someone_won?(board)
+      prompt "#{detect_winner(board)} won!"
+      if detect_winner(board) == "Player"
+        player_wins += 1
+      else
+        computer_wins =+ 1
+      end
+    else
+      prompt "It's a tie!"
+      tie_games += 1
+    end
+
+    score_board_display(player_wins, computer_wins, tie_games)
+    sleep(1.5)
+    break if player_wins == 5 || computer_wins == 5
   end
 
   prompt "Play again? (y or n)"
