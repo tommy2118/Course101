@@ -9,12 +9,9 @@ def prompt(msg)
   puts "=> #{msg}"
 end
 
-def joinor(array, delimiter = ',', *joining_word)
-  joined_string = ''
-  array.each do |word|
-    joined_string += word + delimiter
-  end
-  joined_string
+def joinor(array, delimiter=', ', word='or')
+  array[-1] = "#{word} #{array.last}" if array.size > 1
+  array.join(delimiter)
 end
 
 # rubocop:disable Metrics/AbcSize
@@ -49,7 +46,7 @@ end
 def player_places_piece!(brd)
   square = ''
   loop do
-    prompt "Choose a square (#{empty_squares(brd).join(', ')}):"
+    prompt "Choose a square (#{joinor(empty_squares(brd))}):"
     square = gets.chomp.to_i
     break if empty_squares(brd).include?(square)
     prompt "Sorry, that is not a valid choice."
