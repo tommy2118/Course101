@@ -1,3 +1,4 @@
+FIRST_MOVE = 'choose'.freeze
 INITIAL_MARKER = ' '.freeze
 PLAYER_MARKER = 'X'.freeze
 COMPUTER_MARKER = 'O'.freeze
@@ -58,8 +59,35 @@ def player_places_piece!(brd)
   brd[square] = PLAYER_MARKER
 end
 
+def find_at_risk_square(line, brd, marker)
+  if brd.values_at(*line).count(marker) == 2
+    brd.select { |k, v| line.include?(k) && v == INITIAL_MARKER }.keys.first
+  end
+end
+
 def computer_palces_piece!(brd)
-  square = empty_squares(brd).sample
+  square = nil
+
+  WINNING_LINES.each do |line|
+    square = find_at_risk_square(line, brd, COMPUTER_MARKER)
+    break if square
+  end
+
+  if !square
+    WINNING_LINES.each do |line|
+      square = find_at_risk_square(line, brd, PLAYER_MARKER)
+      break if square
+    end
+  end
+
+  if !square
+    square = 5 if empty_squares(brd).include?(5)
+  end
+
+  if !square
+    square = empty_squares(brd).sample
+  end
+
   brd[square] = COMPUTER_MARKER
 end
 
@@ -85,6 +113,16 @@ end
 player_wins = 0
 computer_wins = 0
 tie_games = 0
+user_override = nil
+if FIRST_MOVE == 'choose' && user_override == nil
+  loop do
+    puts "Who should begin? Type 'c' for Computer or 'p' for Player:"
+    user_override = gets.chomp
+    break unless user_override.empty? || user_override != 'c' \
+      && user_override != 'p'
+    puts "Please enter a valid response."
+  end
+end
 loop do
   loop do
     board = intialize_board
@@ -93,10 +131,18 @@ loop do
     loop do
       display_board(board)
 
-      player_places_piece!(board)
-      break if someone_won?(board) || board_full?(board)
-      computer_palces_piece!(board)
-      break if someone_won?(board) || board_full?(board)
+      if FIRST_MOVE == 'Player' || user_override == 'p'
+        player_places_piece!(board)
+        break if someone_won?(board) || board_full?(board)
+        computer_palces_piece!(board)
+        break if someone_won?(board) || board_full?(board)
+      elsif FIRST_MOVE == 'Computer' || user_override == 'c'
+        computer_palces_piece!(board)
+        display_board(board)
+        break if someone_won?(board) || board_full?(board)
+        player_places_piece!(board)
+        break if someone_won?(board) || board_full?(board)
+      end
     end
 
     display_board(board)
@@ -105,7 +151,7 @@ loop do
       if detect_winner(board) == "Player"
         player_wins += 1
       else
-        computer_wins =+ 1
+        computer_wins += 1
       end
     else
       prompt "It's a tie!"
