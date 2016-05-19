@@ -48,6 +48,22 @@ def empty_squares(brd)
   brd.keys.select { |num| brd[num] == INITIAL_MARKER }
 end
 
+def alternate_player(current_player)
+  current_player = if current_player == "Player"
+                     "Computer"
+                   else
+                     "Player"
+                   end
+end
+
+def place_piece!(brd, current_player)
+  if current_player == "Player"
+    player_places_piece!(brd)
+  else
+    computer_places_piece!(brd)
+  end
+end
+
 def player_places_piece!(brd)
   square = ''
   loop do
@@ -65,7 +81,7 @@ def find_at_risk_square(line, brd, marker)
   end
 end
 
-def computer_palces_piece!(brd)
+def computer_places_piece!(brd)
   square = nil
 
   WINNING_LINES.each do |line|
@@ -113,15 +129,25 @@ end
 player_wins = 0
 computer_wins = 0
 tie_games = 0
-user_override = nil
-if FIRST_MOVE == 'choose' && user_override == nil
+user_first_move_selection = ''
+if FIRST_MOVE == 'Player'
+  current_player = 'Player'
+elsif FIRST_MOVE == 'Computer'
+  current_player = 'Computer'
+else
   loop do
     puts "Who should begin? Type 'c' for Computer or 'p' for Player:"
-    user_override = gets.chomp
-    break unless user_override.empty? || user_override != 'c' \
-      && user_override != 'p'
+    user_first_move_selection = gets.chomp
+    break unless user_first_move_selection.empty? || \
+                 user_first_move_selection != 'c' && \
+                 user_first_move_selection != 'p'
     puts "Please enter a valid response."
   end
+  current_player = if user_first_move_selection == 'c'
+                     'Computer'
+                   else
+                     'Player'
+                   end
 end
 loop do
   loop do
@@ -130,19 +156,9 @@ loop do
 
     loop do
       display_board(board)
-
-      if FIRST_MOVE == 'Player' || user_override == 'p'
-        player_places_piece!(board)
-        break if someone_won?(board) || board_full?(board)
-        computer_palces_piece!(board)
-        break if someone_won?(board) || board_full?(board)
-      elsif FIRST_MOVE == 'Computer' || user_override == 'c'
-        computer_palces_piece!(board)
-        display_board(board)
-        break if someone_won?(board) || board_full?(board)
-        player_places_piece!(board)
-        break if someone_won?(board) || board_full?(board)
-      end
+      place_piece!(board, current_player)
+      current_player = alternate_player(current_player)
+      break if someone_won?(board) || board_full?(board)
     end
 
     display_board(board)
