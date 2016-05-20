@@ -49,11 +49,7 @@ def empty_squares(brd)
 end
 
 def alternate_player(current_player)
-  current_player = if current_player == "Player"
-                     "Computer"
-                   else
-                     "Player"
-                   end
+  current_player = (current_player == "Player") ? "Computer" : "Player"
 end
 
 def place_piece!(brd, current_player)
@@ -135,6 +131,7 @@ if FIRST_MOVE == 'Player'
 elsif FIRST_MOVE == 'Computer'
   current_player = 'Computer'
 else
+
   loop do
     puts "Who should begin? Type 'c' for Computer or 'p' for Player:"
     user_first_move_selection = gets.chomp
