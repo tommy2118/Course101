@@ -1,5 +1,3 @@
-require 'pry'
-
 SUITS = %w(H D C S).freeze
 
 def prompt(message)
