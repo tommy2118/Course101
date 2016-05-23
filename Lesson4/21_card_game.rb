@@ -5,11 +5,9 @@ def prompt(message)
 end
 
 def initialize_deck
-  values = []
-  (2..10).each { |value| values << value }
+  values = [*2..10]
   values += %w(J Q K A)
-  card_deck = values.product(SUITS)
-  card_deck
+  values.product(SUITS)
 end
 
 def deal_card(deck, player)
@@ -31,7 +29,7 @@ def display_dealers_initial_hand(card_one, _card_two)
     + "+" + "-" * 11 + "+" + "  " + "+" + "-" * 11 + "+"
 end
 
-def render_cards(*hand)
+def render_cards(hand)
   part_one = []
   part_two = []
   part_three = []
@@ -92,29 +90,29 @@ def total_cards(hand)
 end
 
 def busted?(hand)
-  return true if total_cards(hand) > 21
+  total_cards(hand) > 21
 end
 
 def display_board_players_turn(players_hand, dealers_hand)
   system('clear') || system('cls')
   display_dealers_initial_hand(*dealers_hand)
-  render_cards(*players_hand)
+  render_cards(players_hand)
   puts "Player: #{total_cards(players_hand)}"
 end
 
 def display_board_dealers_turn(players_hand, dealers_hand)
-  system('clear')
-  render_cards(*dealers_hand)
-  render_cards(*players_hand)
+  system('clear') || system('cls')
+  render_cards(dealers_hand)
+  render_cards(players_hand)
   puts "Player: #{total_cards(players_hand)}"
   puts "Dealer: #{total_cards(dealers_hand)}"
 end
 
 def set_up_game(deck, players_hand, dealers_hand)
-  deal_card(deck, players_hand)
-  deal_card(deck, dealers_hand)
-  deal_card(deck, players_hand)
-  deal_card(deck, dealers_hand)
+  2.times do
+    deal_card(deck, players_hand)
+    deal_card(deck, dealers_hand)
+  end
   display_board_players_turn(players_hand, dealers_hand)
 end
 
@@ -126,34 +124,32 @@ loop do
   set_up_game(deck, players_hand, dealers_hand)
   loop do
     loop do
-      loop do
-        prompt("Type 'h' to hit or 's' to stay")
-        players_answer = gets.chomp.downcase
-        break if players_answer == 'h' || players_answer == 's'
-        prompt("please enter a valid selection.")
-      end
+      prompt("Type 'h' to hit or 's' to stay")
+      players_answer = gets.chomp.downcase
+      break if players_answer == 'h' || players_answer == 's'
+      prompt("please enter a valid selection.")
+    end
 
+    if busted?(players_hand)
+      display_board_players_turn(players_hand, dealers_hand)
+      puts "You busted! Game over!"
+      break
+    elsif players_answer == 's'
+      display_board_players_turn(players_hand, dealers_hand)
+      puts "You chose to stay!"
+      break
+    else
+      deal_card(deck, players_hand)
+      display_board_players_turn(players_hand, dealers_hand)
       if busted?(players_hand)
         display_board_players_turn(players_hand, dealers_hand)
         puts "You busted! Game over!"
         break
-      elsif players_answer == 's'
-        display_board_players_turn(players_hand, dealers_hand)
-        puts "You chose to stay!"
-        break
-      else
-        deal_card(deck, players_hand)
-        display_board_players_turn(players_hand, dealers_hand)
-        if busted?(players_hand)
-          display_board_players_turn(players_hand, dealers_hand)
-          puts "You busted! Game over!"
-          break
-        end
       end
     end
+  end
 
-    break if busted?(players_hand)
-
+  unless busted?(players_hand)
     loop do
       display_board_dealers_turn(players_hand, dealers_hand)
       sleep(1)
@@ -161,8 +157,6 @@ loop do
       display_board_dealers_turn(players_hand, dealers_hand)
       break if busted?(dealers_hand) || total_cards(dealers_hand) >= 17
     end
-
-    break
   end
 
   if busted?(dealers_hand) || total_cards(dealers_hand) < \
